@@ -1,4 +1,0 @@
-  g++ -c -o digest.o digest.cpp -lcrypto 
-  ar rcs WrapperLib.a digest.o
-  g++ app1.cpp -o app WrapperLib.a -lcrypto
-  ./app 

@@ -2,14 +2,15 @@
 #include <iomanip>
 #include <sstream>
 #include <openssl/sha.h>
+#include "digest.h"
 
-std::string sha(const std::string &str){
+std::string get_digest(const std::string &str){
   unsigned char hash[SHA_DIGEST_LENGTH];
 
-  SHA_CTX sha;
-  SHA1_Init(&sha);
-  SHA1_Update(&sha, str.c_str(), str.size());
-  SHA1_Final(hash, &sha);
+  SHA256_CTX sha;
+  SHA256_Init(&sha);
+  SHA256_Update(&sha, str.c_str(), str.size());
+  SHA256_Final(hash, &sha);
 
   std::stringstream ss;
 
@@ -19,8 +20,4 @@ std::string sha(const std::string &str){
   return ss.str();
 }
 
-int main() {
-  std::cout << sha("Terminal Root") << '\n';
-  return 0;
-}
 

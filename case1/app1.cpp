@@ -20,7 +20,7 @@ std::string md5(const std::string &str){
 }
 
 int main() {
-  std::cout << md5("Terminal Root") << '\n';
+  std::cout << "MD5 :" <<md5("SECRET message") << '\n';
   return 0;
 }
 

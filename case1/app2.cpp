@@ -2,9 +2,8 @@
 #include <iomanip>
 #include <sstream>
 #include <openssl/sha.h>
-#include "digest.h"
 
-std::string get_digest(const std::string &str){
+std::string sha(const std::string &str){
   unsigned char hash[SHA_DIGEST_LENGTH];
 
   SHA_CTX sha;
@@ -20,4 +19,8 @@ std::string get_digest(const std::string &str){
   return ss.str();
 }
 
+int main() {
+  std::cout << "SHA1 :" <<sha("SECRET message") << '\n';
+  return 0;
+}
 

@@ -5,6 +5,6 @@ using namespace std;
 
 int main()
 {
-	cout << get_digest("hi");
+        cout << "SHA256 : " << get_digest("SECRET message") << '\n';
 	return 0;
 }

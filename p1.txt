@@ -6,10 +6,13 @@ def remove_tags(xml_str, tags_to_remove):
         # Parse the XML content
         root = ET.fromstring(xml_str)
         # Create a map to find parents
-        parent_map = {child: parent for parent in root.iter() for child in parent}
+        parent_map = {}
+        for parent in root.iter():
+            for child in parent:
+                parent_map[child] = parent
         # Remove specified tags
         for tag in tags_to_remove:
-            for elem in root.findall(f".//{tag}"):
+            for elem in root.findall('.//' + tag):
                 parent = parent_map.get(elem)
                 if parent is not None:
                     parent.remove(elem)

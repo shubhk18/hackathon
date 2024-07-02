@@ -5,17 +5,10 @@ def remove_tags(xml_str, tags_to_remove):
     try:
         # Parse the XML content
         root = ET.fromstring(xml_str)
-        # Create a map to find parents
-        parent_map = {}
-        for parent in root.iter():
-            for child in parent:
-                parent_map[child] = parent
         # Remove specified tags
         for tag in tags_to_remove:
-            for elem in root.findall('.//' + tag):
-                parent = parent_map.get(elem)
-                if parent is not None:
-                    parent.remove(elem)
+            for elem in root.iter(tag):
+                elem.clear()
         # Convert back to string
         return ET.tostring(root, encoding='unicode', method='xml')
     except ET.ParseError:
@@ -28,13 +21,15 @@ def remove_duplicates(input_file, output_file, tags_to_remove):
     with open(input_file, 'r', newline='') as infile:
         reader = csv.reader(infile)
         for row in reader:
-            xml_content = row[3]
-            relevant_xml = remove_tags(xml_content, tags_to_remove)
-            # Create a tuple of the relevant parts (ignoring the first three fields)
-            relevant_part = relevant_xml
-            if relevant_part not in seen:
-                seen.add(relevant_part)
-                unique_rows.append(row)
+            # Process each row
+            if len(row) >= 4:
+                xml_content = row[3]
+                relevant_xml = remove_tags(xml_content, tags_to_remove)
+                # Create a tuple of the relevant parts (ignoring the first three fields)
+                relevant_part = relevant_xml
+                if relevant_part not in seen:
+                    seen.add(relevant_part)
+                    unique_rows.append(row)
 
     with open(output_file, 'w', newline='') as outfile:
         writer = csv.writer(outfile, quoting=csv.QUOTE_MINIMAL, escapechar='\\')

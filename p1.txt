@@ -1,21 +1,23 @@
 import csv
 import xml.etree.ElementTree as ET
 
-def remove_tag1(xml_str):
+def remove_tags(xml_str, tags_to_remove):
     try:
         # Parse the XML content
         root = ET.fromstring(xml_str)
-        # Remove all occurrences of the tag1 element
-        for tag1 in root.findall('.//tag1'):
-            parent = root.find(".//{*}tag1/..")
-            if parent is not None:
-                parent.remove(tag1)
+        # Remove specified tags
+        for tag in tags_to_remove:
+            for elem in root.findall(f".//{tag}"):
+                parent_map = {c: p for p in root.iter() for c in p}
+                parent = parent_map.get(elem)
+                if parent is not None:
+                    parent.remove(elem)
         # Convert back to string
         return ET.tostring(root, encoding='unicode', method='xml')
     except ET.ParseError:
         return xml_str
 
-def remove_duplicates(input_file, output_file):
+def remove_duplicates(input_file, output_file, tags_to_remove):
     seen = set()
     unique_rows = []
 
@@ -23,7 +25,7 @@ def remove_duplicates(input_file, output_file):
         reader = csv.reader(infile)
         for row in reader:
             xml_content = row[3]
-            relevant_xml = remove_tag1(xml_content)
+            relevant_xml = remove_tags(xml_content, tags_to_remove)
             # Create a tuple of the relevant parts (ignoring the first three fields)
             relevant_part = relevant_xml
             if relevant_part not in seen:
@@ -31,12 +33,13 @@ def remove_duplicates(input_file, output_file):
                 unique_rows.append(row)
 
     with open(output_file, 'w', newline='') as outfile:
-        writer = csv.writer(outfile)
+        writer = csv.writer(outfile, quoting=csv.QUOTE_MINIMAL, escapechar='\\')
         writer.writerows(unique_rows)
 
 # Specify the input and output file names
 input_file = 'yourfile.csv'
 output_file = 'unique_file.csv'
+tags_to_remove = ['tag1', 'tag2']  # Replace with the actual tag names you want to ignore
 
 # Remove duplicates and save the result
-remove_duplicates(input_file, output_file)
+remove_duplicates(input_file, output_file, tags_to_remove)

@@ -4,7 +4,14 @@ import xml.etree.ElementTree as ET
 def extract_xml_from_line(line):
     fields = line.strip().split(',')
     xml_string = ','.join(fields[3:])
-    return xml_string
+    
+    # Remove <tag3>...</tag3> from the XML string
+    xml_tree = ET.fromstring(xml_string)
+    for tag3_elem in xml_tree.findall('.//tag3'):
+        tag3_elem.getparent().remove(tag3_elem)
+    
+    modified_xml_string = ET.tostring(xml_tree, encoding='unicode', method='xml')
+    return modified_xml_string
 
 def main(input_file, output_file):
     unique_xml_set = set()

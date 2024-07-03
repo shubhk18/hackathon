@@ -1,88 +1,29 @@
-#!/bin/bash
+import csv
+import xml.etree.ElementTree as ET
 
-# Function to display usage
-usage() {
-    echo "Usage: $0 <input_file> <output_file> <fields_to_ignore> <tags_to_use>"
-    echo "Example: $0 input.csv output.csv 1,2,3 'tag1,tag2'"
-    exit 1
-}
+def extract_xml_from_line(line):
+    fields = line.strip().split(',')
+    xml_string = ','.join(fields[3:])
+    return xml_string
 
-# Check if the correct number of arguments is provided
-if [ "$#" -ne 4 ]; then
-    usage
-fi
+def main(input_file, output_file):
+    unique_xml_set = set()
 
-input_file="$1"
-output_file="$2"
-fields_to_ignore="$3"
-tags_to_use="$4"
+    with open(input_file, 'r') as csv_file:
+        csv_reader = csv.reader(csv_file)
+        
+        for row in csv_reader:
+            if len(row) < 4:
+                continue
+            
+            xml_content = extract_xml_from_line(','.join(row))
+            
+            if xml_content not in unique_xml_set:
+                unique_xml_set.add(xml_content)
+                with open(output_file, 'a') as out_file:
+                    out_file.write(','.join(row) + '\n')
 
-# Check if the input file exists
-if [ ! -f "$input_file" ]; then
-    echo "File not found: $input_file"
-    exit 1
-fi
-
-# Create an array of fields to ignore
-IFS=',' read -r -a ignore_fields <<< "$fields_to_ignore"
-
-# Create an array of tags to use
-IFS=',' read -r -a use_tags <<< "$tags_to_use"
-
-# Function to extract and concatenate all instances of specified tags from the XML field
-extract_useful_tags() {
-    local xml="$1"
-    local result=""
-
-    for tag in "${use_tags[@]}"; do
-        tag_contents=$(echo "$xml" | grep -oP "(?<=<$tag[^>]*>).*?(?=</$tag>)")
-        for content in $tag_contents; do
-            result+="$content"
-        done
-    done
-
-    echo "$result"
-}
-
-# Function to remove ignored fields from a row and use specified tags for comparison
-process_row() {
-    local row="$1"
-    local result=""
-    local field_number=1
-
-    IFS=',' read -r -a fields <<< "$row"
-    for field in "${fields[@]}"; do
-        if [[ ! " ${ignore_fields[@]} " =~ " ${field_number} " ]]; then
-            # Use the specified tags from the fourth field for comparison
-            if [[ $field_number -eq 4 ]]; then
-                # Remove #START_MESSAGE# marker
-                field=$(echo "$field" | sed 's/#START_MESSAGE#//')
-                field=$(extract_useful_tags "$field")
-            fi
-            result+="$field,"
-        fi
-        field_number=$((field_number + 1))
-    done
-
-    # Remove the trailing comma
-    result="${result%,}"
-    echo "$result"
-}
-
-# Use a set to track unique processed rows and their original rows
-declare -A unique_rows
-
-# Read the input file, process each row, and track unique rows
-while IFS= read -r line; do
-    processed_row=$(process_row "$line")
-    if [[ -z "${unique_rows["$processed_row"]}" ]]; then
-        unique_rows["$processed_row"]="$line"
-    fi
-done < "$input_file"
-
-# Write the unique original rows to the output file
-for row in "${unique_rows[@]}"; do
-    echo "$row"
-done > "$output_file"
-
-echo "Unique rows written to $output_file"
+if __name__ == "__main__":
+    input_file = 'input.csv'  # Replace with your input CSV file
+    output_file = 'output.csv'  # Replace with your output CSV file
+    main(input_file, output_file)

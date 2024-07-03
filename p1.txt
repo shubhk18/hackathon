@@ -35,7 +35,7 @@ extract_useful_tags() {
     local result=""
 
     for tag in "${use_tags[@]}"; do
-        tag_contents=$(echo "$xml" | xmllint --xpath "//$tag" - 2>/dev/null)
+        tag_contents=$(echo "$xml" | grep -oP "(?<=<$tag>).*?(?=</$tag>)" | tr -d '\n')
         result+="$tag_contents"
     done
 

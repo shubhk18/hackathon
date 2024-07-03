@@ -3,21 +3,24 @@ import xml.etree.ElementTree as ET
 
 # Function to extract XML content and remove <tag3>
 def extract_xml(xml_string):
-    root = ET.fromstring(xml_string)
+    # Remove the #MESSAGE# prefix
+    xml_content = xml_string.split('#MESSAGE#', 1)[-1].strip()
+    root = ET.fromstring(xml_content)
     for tag in root.findall('tag3'):
         root.remove(tag)
     return ET.tostring(root, encoding='unicode', method='xml')
 
-# Read input CSV file and process rows
+# Define input and output file paths
 input_file = 'input.csv'
 output_file = 'output.csv'
+
+# Set to track unique XML contents
 unique_xml = set()
 filtered_rows = []
 
+# Read input CSV file and process rows
 with open(input_file, 'r', newline='') as csvfile:
     csvreader = csv.reader(csvfile)
-    next(csvreader)  # Skip header if there's any
-
     for row in csvreader:
         xml_content = row[3]
         extracted_xml = extract_xml(xml_content)
@@ -31,4 +34,4 @@ with open(output_file, 'w', newline='') as csvfile:
     csvwriter = csv.writer(csvfile)
     csvwriter.writerows(filtered_rows)
 
-print(f"Filtered output saved to '{output_file}'")
+print("Filtered output saved to 'output.csv'")

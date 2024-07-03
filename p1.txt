@@ -3,7 +3,7 @@
 # Function to display usage
 usage() {
     echo "Usage: $0 <input_file> <output_file> <fields_to_ignore> <tags_to_use>"
-    echo "Example: $0 input.csv output.csv 1,2 'tag1,tag2'"
+    echo "Example: $0 input.csv output.csv 1,2,3 'tag1,tag2'"
     exit 1
 }
 
@@ -29,14 +29,14 @@ IFS=',' read -r -a ignore_fields <<< "$fields_to_ignore"
 # Create an array of tags to use
 IFS=',' read -r -a use_tags <<< "$tags_to_use"
 
-# Function to extract and concatenate specified tags from the third column
+# Function to extract and concatenate all instances of specified tags from the XML field
 extract_useful_tags() {
     local xml="$1"
     local result=""
 
     for tag in "${use_tags[@]}"; do
-        tag_content=$(echo "$xml" | grep -oP "(?<=<$tag>).*?(?=</$tag>)")
-        result+="$tag_content"
+        tag_contents=$(echo "$xml" | xmllint --xpath "//$tag" - 2>/dev/null)
+        result+="$tag_contents"
     done
 
     echo "$result"
@@ -51,8 +51,10 @@ process_row() {
     IFS=',' read -r -a fields <<< "$row"
     for field in "${fields[@]}"; do
         if [[ ! " ${ignore_fields[@]} " =~ " ${field_number} " ]]; then
-            # Use the specified tags from the third field for comparison
-            if [[ $field_number -eq 3 ]]; then
+            # Use the specified tags from the fourth field for comparison
+            if [[ $field_number -eq 4 ]]; then
+                # Remove #START_MESSAGE# marker
+                field=$(echo "$field" | sed 's/#START_MESSAGE#//')
                 field=$(extract_useful_tags "$field")
             fi
             result+="$field,"

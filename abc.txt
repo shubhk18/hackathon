@@ -1,0 +1,1 @@
+tag_content=$(echo "$xml" | grep -oP "<$tag[^>]*>\K.*?(?=</$tag)" | head -1)

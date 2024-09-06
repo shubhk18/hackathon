@@ -1,0 +1,44 @@
+A SWIFT (Society for Worldwide Interbank Financial Telecommunication) message is a standardized format used by banks and financial institutions for international money transfers and other financial transactions. These messages are formatted according to specific types, known as “MT” (Message Type) formats, and each type is designated by a three-digit number (e.g., MT103, MT202).
+
+Here’s a breakdown of a common SWIFT message format:
+
+1. Basic Structure of a SWIFT Message
+
+A SWIFT message is structured into four main blocks:
+
+	•	Block 1: Basic Header Block
+	•	Block 2: Application Header Block
+	•	Block 3: User Header Block (optional)
+	•	Block 4: Text Block (contains the actual transaction information)
+	•	Block 5: Trailer Block (contains control information)
+
+2. Example: MT103 SWIFT Message
+
+An MT103 message is used for single customer credit transfers. Here is a simplified example format:
+
+{1:F01BANKBEBBAXXX2222123456}  // Block 1: Basic Header
+{2:O1031200970103BANKDEFFXXXX22221234569701031200N}  // Block 2: Application Header
+{4:  // Block 4: Text Block
+:20:REFERENCE123456  // Transaction Reference Number
+:23B:CRED  // Bank Operation Code
+:32A:240905USD1000,00  // Value Date, Currency, Amount
+:50K:/1234567890  // Ordering Customer
+JOHN DOE
+123 MAIN ST
+CITY COUNTRY
+:59:/0987654321  // Beneficiary Customer
+JANE SMITH
+456 HIGH ST
+CITY COUNTRY
+:70:INVOICE 1234  // Remittance Information
+:71A:SHA  // Details of Charges
+}
+
+3. Block Details
+
+	•	Block 1: Identifies the sender and the session number.
+	•	Block 2: Specifies the message type (MT103 in this case) and the receiver.
+	•	Block 4: Contains all the transactional details like transaction reference, currency, amount, ordering and beneficiary customer information, etc.
+	•	Block 5: Not shown in the example but includes additional control data and validation checks.
+
+Each message type has a specific format and field requirements, and the details provided in each field are standardized. If you have a specific message type in mind or need more details on a particular aspect, let me know!

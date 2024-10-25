@@ -1,52 +1,28 @@
-import csv
-import xml.etree.ElementTree as ET
+#!/usr/bin/perl
+use strict;
+use warnings;
 
-# Function to extract XML content and remove <tag3>
-def extract_xml(xml_string):
-    # Remove the #MESSAGE# prefix
-    xml_content = xml_string.split('#MESSAGE#', 1)[-1].strip()
-    return xml_content
+# Specify input and output files
+my $input_file = 'input.txt';
+my $output_file = 'output.txt';
 
-# Define input and output file paths
-input_file = 'input.csv'
-output_file = 'output.csv'
+# Open input and output files
+open(my $in, '<', $input_file) or die "Cannot open $input_file: $!";
+open(my $out, '>', $output_file) or die "Cannot open $output_file: $!";
 
-# Set to track unique XML contents
-unique_xml = set()
-filtered_rows = []
+# Process each line
+while (my $line = <$in>) {
+    # Check if line has more than 110 characters
+    if (length($line) > 110) {
+        # Replace 3 characters at offset 110
+        substr($line, 110, 3, 'XYZ');  # Replace with 'XYZ' or desired characters
+    }
+    # Write modified line to output file
+    print $out $line;
+}
 
-# Read input CSV file and process rows
-with open(input_file, 'r', newline='') as csvfile:
-    csvreader = csv.reader(csvfile)
-    for row in csvreader:
-        xml_content_raw = row[3]
-        xml_content = extract_xml(xml_content_raw)
+# Close files
+close($in);
+close($out);
 
-        try:
-            # Attempt to parse the XML
-            root = ET.fromstring(xml_content)
-            
-            # Remove <tag3> if it exists
-            for tag in root.findall('tag3'):
-                root.remove(tag)
-            
-            # Convert modified XML back to string
-            modified_xml = ET.tostring(root, encoding='unicode', method='xml')
-            
-            # Check if modified XML is unique
-            if modified_xml not in unique_xml:
-                unique_xml.add(modified_xml)
-                filtered_rows.append(row)
-        
-        except ET.ParseError as e:
-            print(f"Error parsing XML from row: {row}")
-            print(f"Original XML content: {xml_content_raw}")
-            print(f"Error message: {e}")
-            continue
-
-# Write filtered rows to output CSV file
-with open(output_file, 'w', newline='') as csvfile:
-    csvwriter = csv.writer(csvfile)
-    csvwriter.writerows(filtered_rows)
-
-print("Filtered output saved to 'output.csv'")
+print "Replacement complete. Check output.txt for results.\n";

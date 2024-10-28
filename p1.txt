@@ -25,19 +25,14 @@ import_records() {
     # Create output directory if it doesn't exist
     mkdir -p "$output_dir"
 
-    # Use awk to split at <Document> tags
+    # Use csplit to split at <Document> tags
     echo "Splitting ISO 20022 payment records from $input_file..."
 
-    awk '
-    /<Document>/ { 
-        if (out) close(out);               # Close previous file if open
-        out = sprintf("'"$output_dir"'/payment_record_%d.xml", ++i) 
-    }
-    { print > out }
-    ' "$input_file"
+    # Split the input XML file at each <Document> tag
+    csplit -z -f "$output_dir/payment_record_" "$input_file" '/<Document>/' '{*}'
 
-    # Process each file with a delay
-    for record_file in "$output_dir"/payment_record_*.xml; do
+    # Process each split file with a delay
+    for record_file in "$output_dir"/payment_record_*; do
         # Verify if file was created
         if [[ -f "$record_file" ]]; then
             echo "File $(basename "$record_file") created successfully."

@@ -1,45 +1,71 @@
 #!/bin/bash
 
-# Input parameters
-input_file=$1      # The XML file with multiple ISO 20022 payment records
-output_dir=$2      # Directory where individual XML files will be copied
-delay=5            # Delay in seconds between each copy
-
-# Check if input parameters are provided
-if [[ -z "$input_file" || -z "$output_dir" ]]; then
-    echo "Usage: $0 <input_file> <output_dir>"
+# Check if correct number of arguments is provided
+if [[ $# -lt 2 ]]; then
+    echo "Usage: $0 <import|export> <input_file> <output_dir>"
     exit 1
 fi
 
-# Create output directory if it doesn't exist
-mkdir -p "$output_dir"
+# Get operation type
+operation=$1
 
-# Variables
-record_num=1
-temp_file="$output_dir/temp_record.xml"
+# Define input file and output directory
+input_file=$2
+output_dir=$3
+delay=5  # Delay in seconds between each copy for import
 
-# Use awk to split at <Document> tags
-echo "Splitting ISO 20022 payment records from $input_file..."
+# Function for import operation
+import_records() {
+    # Create output directory if it doesn't exist
+    mkdir -p "$output_dir"
 
-awk '
-/<Document>/ { 
-    if (out) close(out);               # Close previous file if open
-    out = sprintf("'"$output_dir"'/payment_record_%d.xml", ++i) 
+    # Variables
+    record_num=1
+    temp_file="$output_dir/temp_record.xml"
+
+    # Use awk to split at <Document> tags
+    echo "Splitting ISO 20022 payment records from $input_file..."
+
+    awk '
+    /<Document>/ { 
+        if (out) close(out);               # Close previous file if open
+        out = sprintf("'"$output_dir"'/payment_record_%d.xml", ++i) 
+    }
+    { print > out }
+    ' "$input_file"
+
+    # Process each file with a delay
+    for record_file in "$output_dir"/payment_record_*.xml; do
+        # Verify if file was created
+        if [[ -f "$record_file" ]]; then
+            echo "File $(basename "$record_file") created successfully."
+        else
+            echo "Error: File $(basename "$record_file") was not created correctly."
+        fi
+
+        # Delay for MQ processing
+        sleep "$delay"
+    done
+
+    echo "Import process completed."
 }
-{ print > out }
-' "$input_file"
 
-# Process each file with a delay
-for record_file in "$output_dir"/payment_record_*.xml; do
-    # Verify if file was created
-    if [[ -f "$record_file" ]]; then
-        echo "File $(basename "$record_file") created successfully."
-    else
-        echo "Error: File $(basename "$record_file") was not created correctly."
-    fi
+# Function for export operation
+export_records() {
+    echo "Hello"
+}
 
-    # Delay for MQ processing
-    sleep "$delay"
-done
-
-echo "Process completed."
+# Main logic based on operation
+case $operation in
+    import)
+        import_records
+        ;;
+    export)
+        export_records
+        ;;
+    *)
+        echo "Invalid operation: $operation"
+        echo "Use 'import' to split XML records or 'export' to print hello."
+        exit 1
+        ;;
+esac

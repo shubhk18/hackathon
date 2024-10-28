@@ -16,41 +16,30 @@ mkdir -p "$output_dir"
 
 # Variables
 record_num=1
-temp_dir="temp_records"
-mkdir -p "$temp_dir"
+temp_file="$output_dir/temp_record.xml"
 
-# Split XML records using the <Document> tag
+# Use awk to split at <Document> tags
 echo "Splitting ISO 20022 payment records from $input_file..."
 
-# Use csplit to split the file at each <Document> tag
-csplit -z -f "$temp_dir/record_" "$input_file" '/<Document>/' '{*}'
+awk '
+/<Document>/ { 
+    if (out) close(out);               # Close previous file if open
+    out = sprintf("'"$output_dir"'/payment_record_%d.xml", ++i) 
+}
+{ print > out }
+' "$input_file"
 
-# Loop through each split file and move with delay
-for record_file in "$temp_dir/record_"*; do
-    # Skip empty files
-    if [[ ! -s "$record_file" ]]; then
-        continue
-    fi
-
-    # Define destination file path
-    dest_file="$output_dir/payment_record_$record_num.xml"
-    
-    # Move the split file to output directory
-    echo "Moving $record_file to $dest_file..."
-    mv "$record_file" "$dest_file"
-
-    # Verify if file was moved correctly
-    if [[ -f "$dest_file" ]]; then
-        echo "File payment_record_$record_num.xml moved successfully."
+# Process each file with a delay
+for record_file in "$output_dir"/payment_record_*.xml; do
+    # Verify if file was created
+    if [[ -f "$record_file" ]]; then
+        echo "File $(basename "$record_file") created successfully."
     else
-        echo "Error: File payment_record_$record_num.xml was not moved correctly."
+        echo "Error: File $(basename "$record_file") was not created correctly."
     fi
 
-    # Increment record number and delay
-    record_num=$((record_num + 1))
+    # Delay for MQ processing
     sleep "$delay"
 done
 
-# Cleanup temporary files directory
-rmdir "$temp_dir"
 echo "Process completed."

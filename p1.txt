@@ -1,28 +1,55 @@
-#!/usr/bin/perl
-use strict;
-use warnings;
+#!/bin/bash
 
-# Specify input and output files
-my $input_file = 'input.txt';
-my $output_file = 'output.txt';
+# Input parameters
+input_file=$1      # The XML file with multiple records
+output_dir=$2      # Directory where individual XML files will be copied
+delay=5            # Delay in seconds between each copy
 
-# Open input and output files
-open(my $in, '<', $input_file) or die "Cannot open $input_file: $!";
-open(my $out, '>', $output_file) or die "Cannot open $output_file: $!";
+# Check if input parameters are provided
+if [[ -z "$input_file" || -z "$output_dir" ]]; then
+    echo "Usage: $0 <input_file> <output_dir>"
+    exit 1
+fi
 
-# Process each line
-while (my $line = <$in>) {
-    # Check if line has more than 110 characters
-    if (length($line) > 110) {
-        # Replace 3 characters at offset 110
-        substr($line, 110, 3, 'XYZ');  # Replace with 'XYZ' or desired characters
-    }
-    # Write modified line to output file
-    print $out $line;
-}
+# Create output directory if it doesn't exist
+mkdir -p "$output_dir"
 
-# Close files
-close($in);
-close($out);
+# Variables
+record_num=1
+record_file_prefix="record_"
+temp_dir="temp_records"
+mkdir -p "$temp_dir"
 
-print "Replacement complete. Check output.txt for results.\n";
+# Split XML records
+echo "Splitting XML records from $input_file..."
+csplit -s -f "$temp_dir/$record_file_prefix" "$input_file" '/<record>/' '{*}'
+
+# Loop through each split file and move with delay
+for record_file in "$temp_dir/$record_file_prefix"*; do
+    # Skip empty files
+    if [[ ! -s "$record_file" ]]; then
+        continue
+    fi
+
+    # Define destination file path
+    dest_file="$output_dir/record_$record_num.xml"
+    
+    # Copy file and verify
+    echo "Copying $record_file to $dest_file..."
+    cp "$record_file" "$dest_file"
+
+    # Verify if file was copied correctly
+    if cmp -s "$record_file" "$dest_file"; then
+        echo "File record_$record_num.xml copied successfully."
+    else
+        echo "Error: File record_$record_num.xml was not copied correctly."
+    fi
+
+    # Increment record number and delay
+    record_num=$((record_num + 1))
+    sleep "$delay"
+done
+
+# Cleanup temporary files
+rm -rf "$temp_dir"
+echo "Process completed."

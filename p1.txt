@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Input parameters
-input_file=$1      # The XML file with multiple records
+input_file=$1      # The XML file with multiple ISO 20022 payment records
 output_dir=$2      # Directory where individual XML files will be copied
 delay=5            # Delay in seconds between each copy
 
@@ -16,33 +16,34 @@ mkdir -p "$output_dir"
 
 # Variables
 record_num=1
-record_file_prefix="record_"
 temp_dir="temp_records"
 mkdir -p "$temp_dir"
 
-# Split XML records
-echo "Splitting XML records from $input_file..."
-csplit -s -f "$temp_dir/$record_file_prefix" "$input_file" '/<record>/' '{*}'
+# Split XML records using the <Document> tag
+echo "Splitting ISO 20022 payment records from $input_file..."
+
+# Use csplit to split the file at each <Document> tag
+csplit -z -f "$temp_dir/record_" "$input_file" '/<Document>/' '{*}'
 
 # Loop through each split file and move with delay
-for record_file in "$temp_dir/$record_file_prefix"*; do
+for record_file in "$temp_dir/record_"*; do
     # Skip empty files
     if [[ ! -s "$record_file" ]]; then
         continue
     fi
 
     # Define destination file path
-    dest_file="$output_dir/record_$record_num.xml"
+    dest_file="$output_dir/payment_record_$record_num.xml"
     
-    # Copy file and verify
-    echo "Copying $record_file to $dest_file..."
-    cp "$record_file" "$dest_file"
+    # Move the split file to output directory
+    echo "Moving $record_file to $dest_file..."
+    mv "$record_file" "$dest_file"
 
-    # Verify if file was copied correctly
-    if cmp -s "$record_file" "$dest_file"; then
-        echo "File record_$record_num.xml copied successfully."
+    # Verify if file was moved correctly
+    if [[ -f "$dest_file" ]]; then
+        echo "File payment_record_$record_num.xml moved successfully."
     else
-        echo "Error: File record_$record_num.xml was not copied correctly."
+        echo "Error: File payment_record_$record_num.xml was not moved correctly."
     fi
 
     # Increment record number and delay
@@ -50,6 +51,6 @@ for record_file in "$temp_dir/$record_file_prefix"*; do
     sleep "$delay"
 done
 
-# Cleanup temporary files
-rm -rf "$temp_dir"
+# Cleanup temporary files directory
+rmdir "$temp_dir"
 echo "Process completed."

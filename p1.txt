@@ -1,27 +1,29 @@
 #!/bin/bash
 
-# Check if correct number of arguments is provided
-if [[ $# -lt 2 ]]; then
-    echo "Usage: $0 <import|export> <input_file> <output_dir>"
+# Check if the operation type is provided
+if [[ $# -lt 1 ]]; then
+    echo "Usage: $0 <import|export> [input_file] [output_dir]"
     exit 1
 fi
 
 # Get operation type
 operation=$1
 
-# Define input file and output directory
-input_file=$2
-output_dir=$3
-delay=5  # Delay in seconds between each copy for import
-
 # Function for import operation
 import_records() {
+    input_file=$2      # The XML file with multiple ISO 20022 payment records
+    output_dir=$3      # Directory where individual XML files will be copied
+    delay=5            # Delay in seconds between each copy
+
+    # Check if input_file and output_dir parameters are provided
+    if [[ -z "$input_file" || -z "$output_dir" ]]; then
+        echo "For the 'import' operation, please provide both <input_file> and <output_dir>."
+        echo "Usage: $0 import <input_file> <output_dir>"
+        exit 1
+    fi
+
     # Create output directory if it doesn't exist
     mkdir -p "$output_dir"
-
-    # Variables
-    record_num=1
-    temp_file="$output_dir/temp_record.xml"
 
     # Use awk to split at <Document> tags
     echo "Splitting ISO 20022 payment records from $input_file..."
@@ -58,9 +60,19 @@ export_records() {
 # Main logic based on operation
 case $operation in
     import)
-        import_records
+        # Ensure only `import`, `input_file`, and `output_dir` are provided
+        if [[ $# -ne 3 ]]; then
+            echo "Usage for 'import': $0 import <input_file> <output_dir>"
+            exit 1
+        fi
+        import_records "$@"
         ;;
     export)
+        # Ensure only `export` is provided
+        if [[ $# -ne 1 ]]; then
+            echo "Usage for 'export': $0 export"
+            exit 1
+        fi
         export_records
         ;;
     *)

@@ -1,3 +1,8 @@
 SELECT REGEXP_SUBSTR(xml_column, '<[^>]*CDATA[^>]*>.*?</[^>]+>', 1, 1, 'i') AS extracted_tag
 FROM your_table
 WHERE REGEXP_LIKE(xml_column, 'CDATA', 'i');
+
+
+SELECT REGEXP_SUBSTR(xml_column, '<[^>]*CDATA[^>]*>(.*?)</[^>]+>', 1, 1, 'i', 1) AS inner_content
+FROM your_table
+WHERE REGEXP_LIKE(xml_column, 'CDATA', 'i');

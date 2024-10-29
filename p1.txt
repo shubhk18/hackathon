@@ -1,10 +1,10 @@
-my $text = "Abc.....shdhsjjs\nShashank’s\nMi.mid in (‘123’)";
+my $text = "This is a big text containing mi.mid in ('12345') and other content.";
 my $value;
 
-# Match 'mid' keyword, followed by 'in' and capture the value in parentheses
-if ($text =~ /\bmid\b.*?\bin\s*\(\s*['"](\d+)['"]\s*\)/i) {
-    $value = $1;  # Capture group 1 contains the number inside the IN clause
+# Regex to find "mi.mid in ('...')" and extract the value inside quotes
+if ($text =~ /mi\.mid\s+in\s*\(\s*'([^']*)'\s*\)/i) {
+    $value = $1;  # Capture group 1 contains the value inside the quotes
     print "Extracted value: $value\n";
 } else {
-    print "No match found.\n";
+    print "Pattern not found.\n";
 }

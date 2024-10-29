@@ -1,34 +1,10 @@
-use DBI;
+my $text = "Abc.....shdhsjjs\nShashank’s\nMi.mid in (‘123’)";
+my $value;
 
-# Database connection
-my $dbh = DBI->connect("DBI:mysql:database=your_db;host=localhost", "user", "password", { RaiseError => 1 });
-
-# Prepare SQL query to fetch the XML data
-my $sth = $dbh->prepare("SELECT xml_column FROM your_table WHERE condition = ?"); # Adjust with your condition
-$sth->execute('some_value');  # Bind parameter example
-
-# Open output file for writing
-open(my $out, '>', 'pay.txt') or die "Cannot open pay.txt: $!";
-
-# Process each row returned by the query
-while (my @row = $sth->fetchrow_array) {
-    my $xml_content = $row[0];
-
-    # Apply regex to extract content within tag containing "CDATA"
-    if ($xml_content =~ /<[^>]*CDATA[^>]*>(.*?)<\/[^>]+>/i) {
-        my $inner_content = $1;
-
-        # Remove the first 9 and last 3 characters
-        $inner_content = substr($inner_content, 9, length($inner_content) - 12);
-
-        # Write result to output file
-        print $out $inner_content . "\n";
-    }
+# Match 'mid' keyword, followed by 'in' and capture the value in parentheses
+if ($text =~ /\bmid\b.*?\bin\s*\(\s*['"](\d+)['"]\s*\)/i) {
+    $value = $1;  # Capture group 1 contains the number inside the IN clause
+    print "Extracted value: $value\n";
+} else {
+    print "No match found.\n";
 }
-
-# Clean up
-close($out);
-$sth->finish();
-$dbh->disconnect();
-
-print "Data processed and written to pay.txt\n";

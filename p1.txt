@@ -1,10 +1,47 @@
-my $text = "This is a big text containing mi.mid in ('12345') and other content.";
-my $value;
+#!/usr/bin/perl
+use strict;
+use warnings;
 
-# Regex to find "mi.mid in ('...')" and extract the value inside quotes
-if ($text =~ /mi\.mid\s+in\s*\(\s*'([^']*)'\s*\)/i) {
-    $value = $1;  # Capture group 1 contains the value inside the quotes
-    print "Extracted value: $value\n";
-} else {
-    print "Pattern not found.\n";
+# Initialize variables for different arguments
+my $flag = '';
+my $filename = '';
+my @other_args;
+
+# Loop through command-line arguments
+while (my $arg = shift @ARGV) {
+    if ($arg eq '-ISP') {
+        $flag = $arg;
+        $filename = shift @ARGV;   # Get the file name after -ISP
+        last;                      # Stop processing after finding -ISP and file name
+    } else {
+        push @other_args, $arg;    # Collect other arguments before -ISP
+    }
 }
+
+# Validate inputs
+if (!$flag || !$filename) {
+    die "Usage: perl script.pl [other args] -ISP input.txt\n";
+}
+
+# Construct the full file path (assuming 'input' is the directory)
+my $filepath = "input/$filename";
+
+# Open the input file
+open(my $fh, '<', $filepath) or die "Could not open file '$filepath' $!";
+
+# Print other arguments (if needed for debugging)
+print "Other arguments: @other_args\n" if @other_args;
+
+# Read the file line by line
+while (my $line = <$fh>) {
+    chomp $line;                   # Remove newline character
+    my @fields = split /,/, $line; # Split the line by comma into an array
+
+    # Print each field iteratively
+    foreach my $field (@fields) {
+        print "$field\n";
+    }
+}
+
+# Close the file handle
+close $fh;

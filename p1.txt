@@ -1,34 +1,14 @@
-#!/usr/bin/perl
-use strict;
-use warnings;
-use DBI;
+#!/bin/bash
 
-# Database connection details
-my $dsn = "DBI:mysql:database_name;host=hostname";
-my $username = "your_username";
-my $password = "your_password";
+# Define the folder path
+folder_path="/path/to/your/folder"
 
-# Connect to the database
-my $dbh = DBI->connect($dsn, $username, $password, {
-    RaiseError => 1,
-    AutoCommit => 1,
-}) or die "Could not connect to database: $DBI::errstr";
-
-# Read the SQL query from the file
-my $sql_file = 'query.sql';
-open(my $fh, '<', $sql_file) or die "Could not open file '$sql_file' $!";
-my $query = do { local $/; <$fh> };
-close $fh;
-
-# Prepare and execute the query
-my $sth = $dbh->prepare($query);
-$sth->execute();
-
-# Fetch and print results
-while (my @row = $sth->fetchrow_array) {
-    print join(", ", @row), "\n";
-}
-
-# Clean up
-$sth->finish();
-$dbh->disconnect();
+# Check if the folder exists
+if [ -d "$folder_path" ]; then
+    echo "Folder exists. Cleaning up..."
+    # Remove all files and subdirectories in the folder
+    rm -rf "$folder_path"/*
+    echo "Folder cleaned."
+else
+    echo "Folder does not exist. Nothing to clean."
+fi

@@ -30,11 +30,17 @@ EOF
     fi
 }
 
-# Loop through each file in the directory and send it to the MQ queue
-for file in "$FILES_DIR"/*; do
-    if [[ -f "$file" ]]; then
-        send_file_to_mq "$file"
-    else
-        echo "No files found in directory $FILES_DIR."
-    fi
-done
+# Check if the directory exists and has files
+if [[ -d "$FILES_DIR" ]] && [[ $(ls -A "$FILES_DIR") ]]; then
+    # Loop through each file in the directory and send it to the MQ queue
+    for file in "$FILES_DIR"/*; do
+        if [[ -f "$file" ]]; then
+            echo "Sending file '$file' to MQ..."
+            send_file_to_mq "$file"
+        else
+            echo "'$file' is not a regular file and will be skipped."
+        fi
+    done
+else
+    echo "Directory $FILES_DIR does not exist or is empty."
+fi

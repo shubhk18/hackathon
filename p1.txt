@@ -1,1 +1,12 @@
-csplit filename /pattern/ >/dev/null 2>&1
+my $string = "Hello, world!";
+my $target = "Perl";     # Target string to replace with
+my $position = 7;        # Start position in $string
+my $length = 8;          # Length of substring to replace
+
+# Pad $target with zeros if it's shorter than $length
+$target = sprintf("%-${length}s", $target); # Left-justify and pad with spaces
+$target =~ tr/ /0/;                         # Replace spaces with zeros
+
+substr($string, $position, $length, $target);
+
+print $string;  # Output: Hello, Perl000

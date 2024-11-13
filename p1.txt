@@ -1,19 +1,28 @@
 #!/bin/bash
 
-# Generate a timestamped log file
-LOGFILE="script_$(date +'%Y%m%d_%H%M%S').log"
+# Check if the file is provided
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <xml_file>"
+    exit 1
+fi
 
-# Redirect stdout and stderr to the log file and console
-exec > >(tee -a "$LOGFILE") 2>&1
+# Get the file name
+XML_FILE=$1
 
-# Example commands
-echo "Script started at $(date)"
-echo "This is a test message"
-echo "Listing current directory contents:"
-ls -l
+# Check if the file exists
+if [ ! -f "$XML_FILE" ]; then
+    echo "Error: File '$XML_FILE' not found!"
+    exit 1
+fi
 
-# A command that produces an error for testing
-echo "Testing error logging:"
-nonexistent_command
+# Extract the content inside <tag1> using xmllint
+TAG1_CONTENT=$(xmllint --xpath '//tag1/text()' "$XML_FILE" 2>/dev/null)
 
-echo "Script ended at $(date)"
+# Check if xmllint was successful
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to extract <tag1> content. Is the XML well-formed?"
+    exit 1
+fi
+
+# Print the extracted content
+echo "$TAG1_CONTENT"

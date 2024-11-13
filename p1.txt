@@ -15,12 +15,12 @@ if [ ! -f "$XML_FILE" ]; then
     exit 1
 fi
 
-# Extract the content inside <tag1> using xmllint
-TAG1_CONTENT=$(xmllint --xpath '//tag1/text()' "$XML_FILE" 2>/dev/null)
+# Extract the content inside <tag1> using grep and sed
+TAG1_CONTENT=$(grep "<tag1>" "$XML_FILE" | sed -n 's:.*<tag1>\(.*\)</tag1>.*:\1:p')
 
-# Check if xmllint was successful
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to extract <tag1> content. Is the XML well-formed?"
+# Check if content was found
+if [ -z "$TAG1_CONTENT" ]; then
+    echo "Error: <tag1> not found or content is empty."
     exit 1
 fi
 

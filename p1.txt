@@ -1,28 +1,27 @@
 #!/bin/bash
 
-# Check if the file is provided
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <xml_file>"
-    exit 1
-fi
+# Oracle database connection details
+USER="your_username"
+PASSWORD="your_password"
+DB="your_database"
 
-# Get the file name
-XML_FILE=$1
+# SQL query
+SQL_QUERY="SET HEADING OFF
+SET FEEDBACK OFF
+SET PAGESIZE 0
+SELECT column1 || '|' || column2 || '|' || column3 FROM your_table WHERE ROWNUM = 1;"
 
-# Check if the file exists
-if [ ! -f "$XML_FILE" ]; then
-    echo "Error: File '$XML_FILE' not found!"
-    exit 1
-fi
+# Execute the query and capture the output
+result=$(sqlplus -s "$USER/$PASSWORD@$DB" <<EOF
+$SQL_QUERY
+EXIT;
+EOF
+)
 
-# Extract the content inside <tag1> using grep and sed
-TAG1_CONTENT=$(grep "<tag1>" "$XML_FILE" | sed -n 's:.*<tag1>\(.*\)</tag1>.*:\1:p')
+# Parse the result into variables
+IFS="|" read -r var1 var2 var3 <<< "$result"
 
-# Check if content was found
-if [ -z "$TAG1_CONTENT" ]; then
-    echo "Error: <tag1> not found or content is empty."
-    exit 1
-fi
-
-# Print the extracted content
-echo "$TAG1_CONTENT"
+# Print the variables
+echo "Variable 1: $var1"
+echo "Variable 2: $var2"
+echo "Variable 3: $var3"

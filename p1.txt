@@ -4,10 +4,13 @@
 TNS_ALIAS="your_tns_alias"
 
 # Define the SQL query
-SQL_QUERY="SET HEADING OFF
+SQL_QUERY=$(cat <<-SQL
+SET HEADING OFF
 SET FEEDBACK OFF
 SET PAGESIZE 0
-SELECT column1 || '|' || column2 || '|' || column3 FROM your_table WHERE ROWNUM = 1;"
+SELECT column1 || '|' || column2 || '|' || column3 FROM your_table WHERE ROWNUM = 1;
+SQL
+)
 
 # Execute the query and capture the output
 result=$(sqlplus -s /@$TNS_ALIAS <<EOF

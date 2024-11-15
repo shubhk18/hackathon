@@ -1,22 +1,26 @@
 #!/bin/bash
 
-# Oracle database connection details
-USER="your_username"
-PASSWORD="your_password"
-DB="your_database"
+# Define the TNS alias for the database connection
+TNS_ALIAS="your_tns_alias"
 
-# SQL query
+# Define the SQL query
 SQL_QUERY="SET HEADING OFF
 SET FEEDBACK OFF
 SET PAGESIZE 0
 SELECT column1 || '|' || column2 || '|' || column3 FROM your_table WHERE ROWNUM = 1;"
 
 # Execute the query and capture the output
-result=$(sqlplus -s "$USER/$PASSWORD@$DB" <<EOF
+result=$(sqlplus -s /@$TNS_ALIAS <<EOF
 $SQL_QUERY
 EXIT;
 EOF
 )
+
+# Check if the result is empty
+if [ -z "$result" ]; then
+  echo "No data retrieved from the query."
+  exit 1
+fi
 
 # Parse the result into variables
 IFS="|" read -r var1 var2 var3 <<< "$result"

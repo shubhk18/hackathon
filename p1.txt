@@ -8,9 +8,10 @@ DB_HOST="your_db_host"
 DB_PORT="1521"  # Default Oracle port
 DB_SERVICE="your_db_service"
 
-# SQL query to extract multiple columns, including xml_blob
-SQL_QUERY="SELECT id, name, 
-                  UTL_RAW.CAST_TO_VARCHAR2(DBMS_LOB.SUBSTR(xml_blob, 4000, 1)) AS xml_data
+# SQL query to extract multiple columns, including xml_blob (converted to CLOB)
+SQL_QUERY="SELECT id, 
+                  name, 
+                  DBMS_LOB.SUBSTR(DBMS_LOB.CONVERTTOCLOB(xml_blob), 4000, 1) AS xml_data
             FROM xml_data_table;"
 
 # Execute SQLPlus and capture the output in a variable

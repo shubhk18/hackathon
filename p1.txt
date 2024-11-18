@@ -1,41 +1,14 @@
 #!/bin/bash
 
-# Set database connection details
-DB_USER="your_username"
-DB_PASS="your_password"
-DB_SID="your_db_sid"
-DB_HOST="your_db_host"
-DB_PORT="1521"  # Default Oracle port
-DB_SERVICE="your_db_service"
+line="This is an example pattern check pattern with Bash scripting pattern example"
 
-# SQL query to extract XML data
-SQL_QUERY="SELECT id, 
-                  name, 
-                  DBMS_LOB.SUBSTR(xml_blob, 4000, 1) AS xml_data
-            FROM xml_data_table;"
+# Define the delimiter/pattern
+pattern="pattern"
 
-# Execute SQLPlus and capture the output
-RESULT=$(sqlplus -S $DB_USER/$DB_PASS@$DB_HOST:$DB_PORT/$DB_SERVICE <<EOF
-SET LINESIZE 32000
-SET PAGESIZE 0
-SET LONG 100000
-SET LONGCHUNKSIZE 100000
-SET HEADING OFF
-SET FEEDBACK OFF
-$SQL_QUERY
-EOF
-)
+# Replace the pattern with a custom delimiter (e.g., space)
+IFS="$pattern" read -ra parts <<< "$line"
 
-# Loop through each line of the result
-while read -r LINE; do
-    # Skip empty lines
-    [[ -z "$LINE" ]] && continue
-    
-    # Print each row directly
-    echo "Row: $LINE"
-
-    # Optionally save or process the XML content
-    # Example: save the XML part to a file if needed
-    ID=$(echo "$LINE" | awk '{print $1}') # Assuming ID is the first column
-    echo "$LINE" > "output_row_$ID.txt"
-done <<< "$RESULT"
+# Loop through all parts
+for i in "${!parts[@]}"; do
+    echo "Part $((i+1)): ${parts[i]}"
+done

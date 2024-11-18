@@ -8,13 +8,13 @@ DB_HOST="your_db_host"
 DB_PORT="1521"  # Default Oracle port
 DB_SERVICE="your_db_service"
 
-# SQL query to extract multiple columns, including xml_blob (converted to CLOB)
+# SQL query to extract XML data
 SQL_QUERY="SELECT id, 
                   name, 
-                  DBMS_LOB.SUBSTR(DBMS_LOB.CONVERTTOCLOB(xml_blob), 4000, 1) AS xml_data
+                  DBMS_LOB.SUBSTR(xml_blob, 4000, 1) AS xml_data
             FROM xml_data_table;"
 
-# Execute SQLPlus and capture the output in a variable
+# Execute SQLPlus and capture the output
 RESULT=$(sqlplus -S $DB_USER/$DB_PASS@$DB_HOST:$DB_PORT/$DB_SERVICE <<EOF
 SET LINESIZE 32000
 SET PAGESIZE 0
@@ -22,18 +22,20 @@ SET LONG 100000
 SET LONGCHUNKSIZE 100000
 SET HEADING OFF
 SET FEEDBACK OFF
-SET COLSEP '|'
 $SQL_QUERY
 EOF
 )
 
-# Loop through each line of the result (each row)
-echo "$RESULT" | while IFS='|' read -r ID NAME XML_DATA
-do
-    # Process each row
-    echo "Processing Row: ID=$ID, Name=$NAME"
+# Loop through each line of the result
+while read -r LINE; do
+    # Skip empty lines
+    [[ -z "$LINE" ]] && continue
     
-    # Optionally, handle XML data (e.g., save to a file, or process)
-    echo "$XML_DATA" > "extracted_xml_$ID.xml"
-    echo "XML Data for ID=$ID extracted to extracted_xml_$ID.xml"
-done
+    # Print each row directly
+    echo "Row: $LINE"
+
+    # Optionally save or process the XML content
+    # Example: save the XML part to a file if needed
+    ID=$(echo "$LINE" | awk '{print $1}') # Assuming ID is the first column
+    echo "$LINE" > "output_row_$ID.txt"
+done <<< "$RESULT"

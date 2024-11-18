@@ -21,12 +21,13 @@ SET LONG 100000
 SET LONGCHUNKSIZE 100000
 SET HEADING OFF
 SET FEEDBACK OFF
+SET COLSEP '|'
 $SQL_QUERY
 EOF
 )
 
 # Loop through each line of the result (each row)
-echo "$RESULT" | while IFS=" " read -r ID NAME XML_DATA
+echo "$RESULT" | while IFS='|' read -r ID NAME XML_DATA
 do
     # Process each row
     echo "Processing Row: ID=$ID, Name=$NAME"

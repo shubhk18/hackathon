@@ -1,14 +1,11 @@
 #!/bin/bash
 
-line="This is an example pattern check pattern with Bash scripting pattern example"
+# Define remote server details
+REMOTE_USER="your_username"
+REMOTE_HOST="remote_server_address"
 
-# Define the delimiter/pattern
-pattern="pattern"
+# Define the remote command to execute
+REMOTE_COMMAND="ls -l /path/to/directory"
 
-# Replace the pattern with a custom delimiter (e.g., space)
-IFS="$pattern" read -ra parts <<< "$line"
-
-# Loop through all parts
-for i in "${!parts[@]}"; do
-    echo "Part $((i+1)): ${parts[i]}"
-done
+# Execute the remote command
+ssh "${REMOTE_USER}@${REMOTE_HOST}" "${REMOTE_COMMAND}"

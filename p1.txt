@@ -1,1 +1,30 @@
-find / -name "*.kdb" -o -name "*.jks" -o -name "*.p12"
+#!/bin/bash
+
+# Set database connection details
+DB_USER="your_username"
+DB_PASS="your_password"
+DB_SID="your_db_sid"
+DB_HOST="your_db_host"
+DB_PORT="1521"  # Default Oracle port
+DB_SERVICE="your_db_service"
+
+# Specify the SQL query
+SQL_QUERY="SELECT xml_blob FROM xml_data_table WHERE id = 1;"
+
+# Output file for the XML content
+OUTPUT_FILE="extracted_xml.xml"
+
+# Execute SQLPlus command and write the XML BLOB to a file
+sqlplus -S $DB_USER/$DB_PASS@$DB_HOST:$DB_PORT/$DB_SERVICE <<EOF
+SET LINESIZE 32000
+SET PAGESIZE 0
+SET LONG 100000
+SET LONGCHUNKSIZE 100000
+SET HEADING OFF
+SET FEEDBACK OFF
+SPOOL $OUTPUT_FILE
+$SQL_QUERY
+SPOOL OFF
+EOF
+
+echo "XML BLOB has been extracted to $OUTPUT_FILE"

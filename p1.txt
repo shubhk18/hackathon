@@ -8,13 +8,14 @@ DB_HOST="your_db_host"
 DB_PORT="1521"  # Default Oracle port
 DB_SERVICE="your_db_service"
 
-# Specify the SQL query
-SQL_QUERY="SELECT xml_blob FROM xml_data_table WHERE id = 1;"
+# Specify the SQL query to select multiple columns (including xml_blob)
+SQL_QUERY="SELECT id, name, xml_blob FROM xml_data_table WHERE id = 1;"
 
-# Output file for the XML content
-OUTPUT_FILE="extracted_xml.xml"
+# Output file for the extracted data
+OUTPUT_FILE="extracted_data.txt"
+XML_OUTPUT_FILE="extracted_xml.xml"
 
-# Execute SQLPlus command and write the XML BLOB to a file
+# Execute SQLPlus command to extract data
 sqlplus -S $DB_USER/$DB_PASS@$DB_HOST:$DB_PORT/$DB_SERVICE <<EOF
 SET LINESIZE 32000
 SET PAGESIZE 0
@@ -22,9 +23,21 @@ SET LONG 100000
 SET LONGCHUNKSIZE 100000
 SET HEADING OFF
 SET FEEDBACK OFF
+
+# Spool the output into a text file
 SPOOL $OUTPUT_FILE
 $SQL_QUERY
 SPOOL OFF
 EOF
 
-echo "XML BLOB has been extracted to $OUTPUT_FILE"
+# Parse the extracted data and handle XML
+# Extract name and save XML blob to a separate file
+NAME=$(grep "name" $OUTPUT_FILE | awk -F" " '{print $2}')
+echo "Extracted Name: $NAME" > $XML_OUTPUT_FILE
+
+# Extract XML content from the output file (example if XML is in BLOB)
+# In this example, we're assuming the XML BLOB is already in plain text.
+# If it is binary, you'd need to convert it from BLOB to text (e.g., using DBMS_LOB in the query).
+grep "xml_blob" $OUTPUT_FILE | awk -F" " '{print $2}' >> $XML_OUTPUT_FILE
+
+echo "Data and XML extracted to $OUTPUT_FILE and $XML_OUTPUT_FILE"

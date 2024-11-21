@@ -1,11 +1,26 @@
 #!/bin/bash
 
-remote_host="user@remote_host"
-remote_file="/path/to/remote/file"
+# Define database credentials
+DB_USER="your_username"
+DB_PASS="your_password"
+DB_SID="your_database_sid"
 
-# Check if the remote file exists
-if ssh "$remote_host" "[ -f $remote_file ]"; then
-    echo "File exists on the remote server."
-else
-    echo "File does not exist on the remote server."
-fi
+# Define the output file
+output_file="output.xml"
+
+# Clear the output file (if it exists)
+> "$output_file"
+
+# Execute the SQL query in sqlplus and process the output
+sqlplus -s "$DB_USER/$DB_PASS@$DB_SID" <<EOF | while IFS='|' read -r text1 text2 xml
+SET PAGESIZE 0 FEEDBACK OFF VERIFY OFF HEADING OFF ECHO OFF TRIMSPOOL ON
+SELECT text1 || '|' || text2 || '|' || xml FROM your_table;
+EXIT;
+EOF
+do
+    # Write only the XML column to the output file
+    echo "$xml" >> "$output_file"
+
+    # Print only the text1 column to the console
+    echo "Text1: $text1"
+done

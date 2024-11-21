@@ -1,26 +1,10 @@
 #!/bin/bash
 
-# Define database credentials
-DB_USER="your_username"
-DB_PASS="your_password"
-DB_SID="your_database_sid"
-
-# Define the output file
-output_file="output.xml"
-
-# Clear the output file (if it exists)
-> "$output_file"
-
-# Execute the SQL query in sqlplus and process the output
-sqlplus -s "$DB_USER/$DB_PASS@$DB_SID" <<EOF | while IFS='|' read -r text1 text2 xml
-SET PAGESIZE 0 FEEDBACK OFF VERIFY OFF HEADING OFF ECHO OFF TRIMSPOOL ON
-SELECT text1 || '|' || text2 || '|' || xml FROM your_table;
-EXIT;
-EOF
-do
-    # Write only the XML column to the output file
-    echo "$xml" >> "$output_file"
-
-    # Print only the text1 column to the console
+# Read the file line by line
+while IFS=' ' read -r text1 text2 xml; do
+    # Print the three parts
     echo "Text1: $text1"
-done
+    echo "Text2: $text2"
+    echo "XML: $xml"
+    echo "---"
+done < input.txt

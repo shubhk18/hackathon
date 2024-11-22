@@ -1,10 +1,17 @@
 #!/bin/bash
 
-# Read the file line by line
-while IFS=' ' read -r text1 text2 xml; do
-    # Print the three parts
-    echo "Text1: $text1"
-    echo "Text2: $text2"
-    echo "XML: $xml"
-    echo "---"
-done < input.txt
+# Define a Bash variable
+my_variable="some_value"
+
+# Pass the Bash variable as a bind variable
+sqlplus -s username/password@database <<EOF
+VARIABLE var1 VARCHAR2(100)
+BEGIN
+  :var1 := '$my_variable';
+END;
+/
+
+SELECT * FROM your_table WHERE your_column = :var1;
+
+EXIT;
+EOF

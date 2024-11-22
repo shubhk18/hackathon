@@ -3,15 +3,16 @@
 # Define a Bash variable
 my_variable="some_value"
 
-# Pass the Bash variable as a bind variable
-sqlplus -s username/password@database <<EOF
-VARIABLE var1 VARCHAR2(100)
-BEGIN
-  :var1 := '$my_variable';
-END;
-/
-
-SELECT * FROM your_table WHERE your_column = :var1;
-
+# Execute SQL and capture the result in a variable
+result=$(sqlplus -s username/password@database <<EOF
+SET PAGESIZE 0 FEEDBACK OFF VERIFY OFF HEADING OFF ECHO OFF
+SELECT your_column FROM your_table WHERE your_column = '$my_variable';
 EXIT;
 EOF
+)
+
+# Trim whitespace from the result (optional)
+result=$(echo $result | xargs)
+
+# Print the result
+echo "Query result: $result"

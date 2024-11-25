@@ -4,3 +4,11 @@ xml_content='<root>
 
 single_line_xml=$(echo "$xml_content" | tr -d '\n' | tr -s ' ')
 echo "$single_line_xml"
+
+
+
+--------
+
+
+formatted_xml=$(echo "$xml_content" | sed 's/></>\n</g')
+echo "$formatted_xml"

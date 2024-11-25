@@ -1,18 +1,6 @@
-#!/bin/bash
+xml_content='<root>
+    <tag>Content</tag>
+</root>'
 
-# Define a Bash variable
-my_variable="some_value"
-
-# Execute SQL and capture the result in a variable
-result=$(sqlplus -s username/password@database <<EOF
-SET PAGESIZE 0 FEEDBACK OFF VERIFY OFF HEADING OFF ECHO OFF
-SELECT your_column FROM your_table WHERE your_column = '$my_variable';
-EXIT;
-EOF
-)
-
-# Trim whitespace from the result (optional)
-result=$(echo $result | xargs)
-
-# Print the result
-echo "Query result: $result"
+single_line_xml=$(echo "$xml_content" | tr -d '\n' | tr -s ' ')
+echo "$single_line_xml"

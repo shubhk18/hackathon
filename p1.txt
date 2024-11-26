@@ -12,3 +12,34 @@ echo "$single_line_xml"
 
 formatted_xml=$(echo "$xml_content" | sed 's/></>\n</g')
 echo "$formatted_xml"
+=======
+
+
+#!/bin/bash
+
+# Database credentials
+DB_USER="scott"
+DB_PASS="tiger"
+DB_CONN="orcl"
+
+# SQL Update Query
+update_sql="UPDATE employees SET salary = salary * 1.1 WHERE department_id = 10;"
+
+# Run the update query and capture the status
+result=$(sqlplus -s "${DB_USER}/${DB_PASS}@${DB_CONN}" <<EOF
+SET SERVEROUTPUT ON;
+SET FEEDBACK OFF;
+WHENEVER SQLERROR EXIT SQL.SQLCODE;
+${update_sql}
+COMMIT;
+EXIT;
+EOF
+)
+
+# Check the exit status
+if [[ $? -eq 0 ]]; then
+    echo "Update ran successfully."
+else
+    echo "Update failed. Details:"
+    echo "$result"
+fi

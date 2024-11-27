@@ -1,45 +1,46 @@
-xml_content='<root>
-    <tag>Content</tag>
-</root>'
-
-single_line_xml=$(echo "$xml_content" | tr -d '\n' | tr -s ' ')
-echo "$single_line_xml"
-
-
-
---------
-
-
-formatted_xml=$(echo "$xml_content" | sed 's/></>\n</g')
-echo "$formatted_xml"
-=======
-
-
 #!/bin/bash
 
-# Database credentials
-DB_USER="scott"
-DB_PASS="tiger"
-DB_CONN="orcl"
+# Define the path to the configuration file
+CONFIG_FILE="config.conf"
 
-# SQL Update Query
-update_sql="UPDATE employees SET salary = salary * 1.1 WHERE department_id = 10;"
-
-# Run the update query and capture the status
-result=$(sqlplus -s "${DB_USER}/${DB_PASS}@${DB_CONN}" <<EOF
-SET SERVEROUTPUT ON;
-SET FEEDBACK OFF;
-WHENEVER SQLERROR EXIT SQL.SQLCODE;
-${update_sql}
-COMMIT;
-EXIT;
-EOF
-)
-
-# Check the exit status
-if [[ $? -eq 0 ]]; then
-    echo "Update ran successfully."
-else
-    echo "Update failed. Details:"
-    echo "$result"
+# Check if the configuration file exists
+if [[ ! -f "$CONFIG_FILE" ]]; then
+    echo "Error: Configuration file '$CONFIG_FILE' not found!"
+    exit 1
 fi
+
+# Variables to hold the current section and its content
+current_section=""
+
+# Read the configuration file line by line
+while IFS= read -r line || [[ -n "$line" ]]; do
+    # Trim whitespace
+    line=$(echo "$line" | xargs)
+
+    # Skip empty lines and comments
+    [[ -z "$line" || "$line" == \#* ]] && continue
+
+    # Check if the line is a section (e.g., "Prod", "UAT")
+    if [[ ! "$line" =~ = ]]; then
+        current_section=$line
+        echo "Processing section: $current_section"
+        continue
+    fi
+
+    # If it's a key-value pair, process it
+    key=$(echo "$line" | cut -d '=' -f 1)
+    value=$(echo "$line" | cut -d '=' -f 2)
+
+    # Handle key-value pairs based on the current section
+    case $current_section in
+        Prod)
+            echo "Prod -> $key=$value"
+            ;;
+        UAT)
+            echo "UAT -> $key=$value"
+            ;;
+        *)
+            echo "Unknown section: $current_section"
+            ;;
+    esac
+done < "$CONFIG_FILE"

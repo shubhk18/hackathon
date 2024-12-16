@@ -1,1 +1,13 @@
-sed -e 's/<tag1>[^<]*<\/tag1>//g' -e 's/<tag2>[^<]*<\/tag2>//g' input.xml > output.xml
+#!/bin/bash
+
+# Define the directory containing the logs
+LOG_DIR="/path/to/logs"
+
+# Define the age threshold for cleanup (e.g., delete logs older than 7 days)
+AGE_THRESHOLD=7
+
+# Log cleanup: Delete logs older than the specified number of days
+find "$LOG_DIR" -type f -name "*.log" -mtime +$AGE_THRESHOLD -exec rm -f {} \;
+
+# Log the cleanup action to a file
+echo "Log cleanup completed on $(date)" >> "$LOG_DIR/cleanup.log"

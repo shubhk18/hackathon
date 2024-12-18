@@ -1,24 +1,9 @@
-#!/bin/bash
+SET LINESIZE 32767
+SET PAGESIZE 50
+SET LONG 100000
+SET LONGCHUNKSIZE 100000
+SET WRAP ON
+COLUMN column1 FORMAT A4000
+COLUMN column2 FORMAT A4000
 
-# Define the directory containing the logs
-LOG_DIR="/path/to/logs"
-
-# Define the maximum number of logs to keep
-MAX_LOG_COUNT=10
-
-# Get the current number of log files in the directory
-CURRENT_LOG_COUNT=$(find "$LOG_DIR" -type f -name "*.log" | wc -l)
-
-# Check if the current log count exceeds the maximum allowed
-if [ "$CURRENT_LOG_COUNT" -gt "$MAX_LOG_COUNT" ]; then
-    # Calculate how many logs to delete
-    LOGS_TO_DELETE=$((CURRENT_LOG_COUNT - MAX_LOG_COUNT))
-    
-    # Find and delete the oldest log files to bring the count down
-    find "$LOG_DIR" -type f -name "*.log" | sort | head -n "$LOGS_TO_DELETE" | xargs rm -f
-    
-    # Log the cleanup action to a file
-    echo "Log cleanup completed on $(date): Deleted $LOGS_TO_DELETE logs" >> "$LOG_DIR/cleanup.log"
-else
-    echo "No cleanup needed. Current log count is within the limit."
-fi
+SELECT * FROM your_table;

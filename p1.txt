@@ -1,9 +1,45 @@
-SET LINESIZE 32767
-SET PAGESIZE 50
-SET LONG 100000
-SET LONGCHUNKSIZE 100000
-SET WRAP ON
-COLUMN column1 FORMAT A4000
-COLUMN column2 FORMAT A4000
+#!/bin/bash
 
-SELECT * FROM your_table;
+# Check if the input file is provided
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <input_mt202_file>"
+    exit 1
+fi
+
+INPUT_FILE=$1
+OUTPUT_DIR="modified_files"
+
+# Check if input file exists
+if [ ! -f "$INPUT_FILE" ]; then
+    echo "Error: Input file $INPUT_FILE does not exist."
+    exit 1
+fi
+
+# Create output directory
+mkdir -p $OUTPUT_DIR
+
+# Function to generate a random 16-character alphanumeric string
+generate_unique_id() {
+    tr -dc 'A-Za-z0-9' </dev/urandom | head -c 16
+}
+
+# Loop to create 10 modified files
+for i in $(seq 1 10); do
+    OUTPUT_FILE="${OUTPUT_DIR}/mt202_modified_$i.txt"
+    
+    # Generate a unique identifier for :20:
+    UNIQUE_ID=$(generate_unique_id)
+    
+    # Modify field :20: with the unique identifier
+    awk -v id="$UNIQUE_ID" '{
+        if ($0 ~ /^:20:/) {
+            print ":20:" id;
+        } else {
+            print $0;
+        }
+    }' "$INPUT_FILE" > "$OUTPUT_FILE"
+    
+    echo "File $OUTPUT_FILE created with unique :20: value: $UNIQUE_ID"
+done
+
+echo "All 10 files have been created in the directory: $OUTPUT_DIR"

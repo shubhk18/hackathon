@@ -15,6 +15,15 @@ if [ ! -f "$INPUT_FILE" ]; then
     exit 1
 fi
 
+# Prompt user for the number of files to generate
+read -p "Enter the number of output files to generate: " FILE_COUNT
+
+# Validate the user input
+if ! [[ "$FILE_COUNT" =~ ^[0-9]+$ ]] || [ "$FILE_COUNT" -le 0 ]; then
+    echo "Error: Please enter a valid positive integer."
+    exit 1
+fi
+
 # Create output directory
 mkdir -p $OUTPUT_DIR
 
@@ -23,23 +32,23 @@ generate_unique_id() {
     tr -dc 'A-Z0-9_' </dev/urandom | head -c 16
 }
 
-# Loop to create 10 modified files
-for i in $(seq 1 10); do
+# Loop to create the specified number of modified files
+for i in $(seq 1 "$FILE_COUNT"); do
     OUTPUT_FILE="${OUTPUT_DIR}/mt202_modified_$i.txt"
     
     # Generate a unique identifier for :20:
     UNIQUE_ID=$(generate_unique_id)
     
-    # Modify field :20: with the unique identifier
+    # Modify field :20: with the unique identifier, ensuring no extra characters
     awk -v id="$UNIQUE_ID" '{
         if ($0 ~ /^:20:/) {
             print ":20:" id;
         } else {
             print $0;
         }
-    }' "$INPUT_FILE" > "$OUTPUT_FILE"
+    }' "$INPUT_FILE" | sed 's/[ \t]*$//' > "$OUTPUT_FILE"
     
     echo "File $OUTPUT_FILE created with unique :20: value: $UNIQUE_ID"
 done
 
-echo "All 10 files have been created in the directory: $OUTPUT_DIR"
+echo "All $FILE_COUNT files have been created in the directory: $OUTPUT_DIR"

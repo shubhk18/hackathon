@@ -1,70 +1,37 @@
 #!/bin/bash
 
-# Check if the input file, file count, and wallet alias are provided
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <input_mt202_file> <file_count> <wallet_alias>"
-    exit 1
+# Check if enough arguments are passed
+if [ $# -ne 2 ]; then
+  echo "Usage: $0 <template_file> <label_name>"
+  exit 1
 fi
 
-INPUT_FILE=$1
-FILE_COUNT=$2
-TNS_ALIAS=$3
-OUTPUT_DIR="modified_files"
+# Input arguments
+template_file="$1"
+label_name="$2"
+temp_file="temp_output.txt"
 
-# Check if input file exists
-if [ ! -f "$INPUT_FILE" ]; then
-    echo "Error: Input file $INPUT_FILE does not exist."
-    exit 1
+# Validate the template file exists
+if [ ! -f "$template_file" ]; then
+  echo "Error: Template file '$template_file' does not exist."
+  exit 1
 fi
 
-# Validate the file count
-if ! [[ "$FILE_COUNT" =~ ^[0-9]+$ ]] || [ "$FILE_COUNT" -le 0 ]; then
-    echo "Error: <file_count> must be a positive integer."
-    exit 1
+# Extract content for the specified label
+awk -v label="$label_name" '
+  BEGIN {found=0} 
+  # Match label (e.g., L1:)
+  $0 ~ label ":" {found=1; next} 
+  # Stop on the next label or end of file
+  found && /^L[0-9]+:/ {found=0} 
+  # Print content if inside the matching label
+  found {print}
+' "$template_file" > "$temp_file"
+
+# Check if content was written
+if [ -s "$temp_file" ]; then
+  echo "Content for '$label_name' has been written to $temp_file."
+else
+  echo "Error: No content found for label '$label_name'."
+  rm -f "$temp_file"
 fi
-
-# Create output directory
-mkdir -p $OUTPUT_DIR
-
-# Function to generate a random 16-character alphanumeric string with underscores
-generate_unique_id() {
-    tr -dc 'A-Z0-9_' </dev/urandom | head -c 16
-}
-
-# Function to fetch and format the date using SQL*Plus with Oracle Wallet
-fetch_sql_date() {
-    sqlplus -s "/@$TNS_ALIAS" <<EOF
-SET HEADING OFF
-SET FEEDBACK OFF
-SET PAGESIZE 0
-SELECT TO_CHAR(SYSDATE, 'YYMMDD') FROM DUAL;
-EXIT
-EOF
-}
-
-# Loop to create the specified number of modified files
-for i in $(seq 1 "$FILE_COUNT"); do
-    OUTPUT_FILE="${OUTPUT_DIR}/mt202_modified_$i.txt"
-    
-    # Generate a unique identifier for :20:
-    UNIQUE_ID=$(generate_unique_id)
-    
-    # Fetch and format the date for :32A:
-    FORMATTED_DATE=$(fetch_sql_date | tr -d '[:space:]')  # Remove any extra spaces
-    
-    # Modify fields :20: and :32A:
-    awk -v id="$UNIQUE_ID" -v date="$FORMATTED_DATE" '{
-        if ($0 ~ /^:20:/) {
-            print ":20:" id;
-        } else if ($0 ~ /^:32A:/) {
-            # Replace only the first 6 characters in :32A:
-            print substr($0, 1, 5) date substr($0, 12);
-        } else {
-            print $0;
-        }
-    }' "$INPUT_FILE" | sed 's/[ \t]*$//' > "$OUTPUT_FILE"
-    
-    echo "File $OUTPUT_FILE created with unique :20: value: $UNIQUE_ID and updated :32A: date: $FORMATTED_DATE"
-done
-
-echo "All $FILE_COUNT files have been created in the directory: $OUTPUT_DIR"

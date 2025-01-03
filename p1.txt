@@ -1,3 +1,6 @@
+sed -i '/^$/d' file.txt
+
+
 #!/bin/bash
 
 # Check if enough arguments are passed

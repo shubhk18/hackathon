@@ -1,1 +1,7 @@
-sed -i 's#<tag1>.*</tag1>#<tag1>new content</tag1>#' file.xml
+#!/bin/bash
+
+# Define the Bash variable
+new_content="new content"
+
+# Replace content between <tag>...</tag> with the value of the variable
+sed -i "s|<tag>.*</tag>|<tag>$new_content</tag>|" file.xml

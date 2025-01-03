@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# Define the Bash variable
-new_content="new content"
+# Input date in yymmdd format
+input_date="250103"
 
-# Replace content between <tag>...</tag> with the value of the variable
-sed -i "s|<tag>.*</tag>|<tag>$new_content</tag>|" file.xml
+# Convert to yyyy-mm-dd format
+formatted_date=$(date -d "20${input_date:0:2}-${input_date:2:2}-${input_date:4:2}" +"%Y-%m-%d")
+
+echo "$formatted_date"

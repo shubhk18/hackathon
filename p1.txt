@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Input date in yymmdd format
-input_date="250103"
+# Define the label and the output file name based on the label
+label="l1"
+output_file="output_l1.txt"
 
-# Convert to yyyy-mm-dd format
-formatted_date=$(date -d "20${input_date:0:2}-${input_date:2:2}-${input_date:4:2}" +"%Y-%m-%d")
+# Extract content for Label l1 and save it to the output file
+sed -n "/Label $label:/,/^$/ { /^$/! p }" file.txt > "$output_file"
 
-echo "$formatted_date"
+echo "Content for Label $label has been saved to $output_file."

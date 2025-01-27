@@ -1,58 +1,11 @@
-Given your parameters, you can create a heat map in Microsoft Excel to visualize how each server is performing compared to its thresholds. Here’s how you can organize your data and use Excel to analyze it effectively:
+SET PAGESIZE 0          -- Disable pagination and column headers
+SET LINESIZE 1000       -- Prevent line wrapping; adjust as needed
+SET FEEDBACK OFF        -- Suppress feedback like "N rows selected"
+SET TRIMSPOOL ON        -- Remove trailing spaces in the output
 
-Step 1: Organize Your Data
+SPOOL employee_names.txt -- Start spooling to the output file
 
-Set up your data in the following format:
+SELECT name
+FROM employees;         -- Replace with your actual query and table name
 
-Server Name	VM/Physical	Purpose	CPU Utilization (%)	CPU Threshold (%)	Memory Utilization (%)	Memory Threshold (%)
-Server1	VM	App Server	65	80	70	90
-Server2	Physical	DB Server	85	80	95	90
-Server3	VM	Web Server	40	75	50	80
-
-Step 2: Apply Conditional Formatting
-
-Use conditional formatting to highlight utilization percentages that exceed their thresholds.
-
-CPU Utilization Heat Map:
-	1.	Highlight the CPU Utilization (%) column.
-	2.	Go to Home > Conditional Formatting > New Rule.
-	3.	Choose Format cells based on their values.
-	4.	Use a 3-color scale:
-	•	Green: Values below 50% of the threshold.
-	•	Yellow: Between 50% and 100% of the threshold.
-	•	Red: Values exceeding the threshold.
-
-Memory Utilization Heat Map:
-	1.	Highlight the Memory Utilization (%) column.
-	2.	Repeat the steps above, adjusting thresholds accordingly.
-
-Custom Rule for Threshold Comparison:
-	1.	Highlight both CPU Utilization (%) and CPU Threshold (%).
-	2.	Go to Conditional Formatting > New Rule.
-	3.	Use the formula:
-
-=D2>E2
-
-	•	This checks if the CPU Utilization exceeds the CPU Threshold.
-
-	4.	Set a red fill or other formatting to highlight violations.
-
-Repeat the same for Memory Utilization vs. Memory Threshold.
-
-Step 3: Add Filtering for Purpose or Server Type
-	1.	Turn your table into a filterable list:
-	•	Select the data, then go to Insert > Table.
-	2.	Use the dropdown filters to view data by Purpose (e.g., App Server) or Server Type (VM/Physical).
-
-Step 4: Optional Chart
-
-Create a Clustered Bar Chart to show utilization vs. thresholds for better visual comparison:
-	1.	Highlight the CPU Utilization, CPU Threshold, Memory Utilization, and Memory Threshold columns.
-	2.	Go to Insert > Recommended Charts > Clustered Bar Chart.
-
-Benefits:
-	•	Quick Identification: See servers exceeding thresholds at a glance.
-	•	Custom Insights: Easily filter by server type or purpose.
-	•	Automation: Conditional formatting dynamically adjusts as data changes.
-
-Would you like a sample Excel template or detailed instructions for specific features?
+SPOOL OFF               -- Stop spooling and save the file

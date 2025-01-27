@@ -5,12 +5,15 @@ DECLARE
 BEGIN
     FOR rec IN id_cursor LOOP
         -- Loop through each row in target_table
-        FOR target_rec IN (SELECT id, column1, column2, column3, status
+        FOR target_rec IN (SELECT id, NVL(column1, '') AS column1, 
+                                 NVL(column2, '') AS column2, 
+                                 NVL(column3, '') AS column3, 
+                                 status
                            FROM target_table) LOOP
-            -- Check if the current ID is found in any of the three columns
-            IF target_rec.column1 NOT LIKE '%,' || rec.id || ',%' 
-               AND target_rec.column2 NOT LIKE '%,' || rec.id || ',%' 
-               AND target_rec.column3 NOT LIKE '%,' || rec.id || ',%' THEN
+            -- Normalize column values by trimming spaces and adding commas
+            IF INSTR(',' || TRIM(REPLACE(target_rec.column1, ' ', '')) || ',', ',' || rec.id || ',') = 0
+               AND INSTR(',' || TRIM(REPLACE(target_rec.column2, ' ', '')) || ',', ',' || rec.id || ',') = 0
+               AND INSTR(',' || TRIM(REPLACE(target_rec.column3, ' ', '')) || ',', ',' || rec.id || ',') = 0 THEN
                 -- If not found in all three columns, update the status column
                 UPDATE target_table
                 SET status = 'Not Found'

@@ -1,3 +1,23 @@
-     SELECT *
-FROM my_table
-WHERE INSTR(',' || column1 || ',', ',abc,') > 0;
+DECLARE
+    CURSOR id_cursor IS
+        SELECT id FROM ids_table; -- Cursor to select all IDs
+    v_id ids_table.id%TYPE;       -- Variable to store the current ID
+BEGIN
+    FOR rec IN id_cursor LOOP
+        -- Loop through each row in target_table
+        FOR target_rec IN (SELECT id, column1, column2, column3, status
+                           FROM target_table) LOOP
+            -- Check if the current ID is found in any of the three columns
+            IF INSTR(',' || target_rec.column1 || ',', ',' || rec.id || ',') = 0
+               AND INSTR(',' || target_rec.column2 || ',', ',' || rec.id || ',') = 0
+               AND INSTR(',' || target_rec.column3 || ',', ',' || rec.id || ',') = 0 THEN
+                -- If not found in all three columns, update the status column
+                UPDATE target_table
+                SET status = 'Not Found'
+                WHERE id = target_rec.id;
+            END IF;
+        END LOOP;
+    END LOOP;
+    COMMIT; -- Commit the changes
+END;
+/

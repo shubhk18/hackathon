@@ -1,26 +1,9 @@
-DECLARE
-    CURSOR id_cursor IS
-        SELECT id FROM ids_table; -- Cursor to select all IDs
-    v_id ids_table.id%TYPE;       -- Variable to store the current ID
-BEGIN
-    FOR rec IN id_cursor LOOP
-        -- Loop through each row in target_table
-        FOR target_rec IN (SELECT id, NVL(column1, '') AS column1, 
-                                 NVL(column2, '') AS column2, 
-                                 NVL(column3, '') AS column3, 
-                                 status
-                           FROM target_table) LOOP
-            -- Normalize column values by trimming spaces and adding commas
-            IF INSTR(',' || TRIM(REPLACE(target_rec.column1, ' ', '')) || ',', ',' || rec.id || ',') = 0
-               AND INSTR(',' || TRIM(REPLACE(target_rec.column2, ' ', '')) || ',', ',' || rec.id || ',') = 0
-               AND INSTR(',' || TRIM(REPLACE(target_rec.column3, ' ', '')) || ',', ',' || rec.id || ',') = 0 THEN
-                -- If not found in all three columns, update the status column
-                UPDATE target_table
-                SET status = 'Not Found'
-                WHERE id = target_rec.id;
-            END IF;
-        END LOOP;
-    END LOOP;
-    COMMIT; -- Commit the changes
-END;
-/
+UPDATE target_table t
+SET status = 'Not Found'
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM ids_table i
+    WHERE (t.column1 IS NOT NULL AND INSTR(',' || t.column1 || ',', ',' || i.id || ',') > 0)
+       OR (t.column2 IS NOT NULL AND INSTR(',' || t.column2 || ',', ',' || i.id || ',') > 0)
+       OR (t.column3 IS NOT NULL AND INSTR(',' || t.column3 || ',', ',' || i.id || ',') > 0)
+);

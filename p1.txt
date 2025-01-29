@@ -1,9 +1,1 @@
-UPDATE target_table t
-SET status = 'Not Found'
-WHERE NOT EXISTS (
-    SELECT 1
-    FROM ids_table i
-    WHERE (t.column1 IS NOT NULL AND INSTR(',' || t.column1 || ',', ',' || i.id || ',') > 0)
-       OR (t.column2 IS NOT NULL AND INSTR(',' || t.column2 || ',', ',' || i.id || ',') > 0)
-       OR (t.column3 IS NOT NULL AND INSTR(',' || t.column3 || ',', ',' || i.id || ',') > 0)
-);
+find /path/to/directory -type f -exec sed -i 's/abc/xyz/g' {} +

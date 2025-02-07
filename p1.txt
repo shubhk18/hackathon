@@ -2,3 +2,6 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Current Time: ' || TO_CHAR(SYSTIMESTAMP, 'HH24:MI:SS.FF3'));
 END;
 /
+
+
+echo "Current Time: $(date +"%H:%M:%S.%3N")"

@@ -1,7 +1,26 @@
-BEGIN
-    DBMS_OUTPUT.PUT_LINE('Current Time: ' || TO_CHAR(SYSTIMESTAMP, 'HH24:MI:SS.FF3'));
-END;
-/
+GitHub hooks can indeed play a vital role in enforcing cybersecurity and compliance standards directly within your code repository. Here are some approaches to achieve this:
+
+⸻
+
+1. Pre-Commit and Pre-Push Hooks
+	•	Local Enforcement:
+Developers can use client-side Git hooks (via tools like pre-commit) to run static code analysis, secret scanning, or compliance scripts before the code is even committed or pushed. This reduces the chance of insecure or non-compliant code reaching the repository.
+	•	Common Checks:
+	•	Static Code Analysis: Use linters and security scanners (e.g., ESLint, Bandit for Python) to detect vulnerabilities.
+	•	Secrets Detection: Scan for accidental commits of API keys, passwords, or other sensitive data.
+	•	Compliance Rules: Enforce coding standards and license checks.
 
 
-echo "Current Time: $(date +"%H:%M:%S.%3N")"
+Git Secrets is an open-source tool originally developed by AWS Labs designed to help prevent developers from committing sensitive information—such as API keys, passwords, and other credentials—into Git repositories. Here’s a detailed look at its features, usage, and best practices:
+
+⸻
+
+Key Features
+	•	Pre-commit and Commit-msg Hooks:
+Git Secrets integrates with Git’s hook system. When installed, it sets up hooks that automatically scan commits for patterns that resemble sensitive data before they are added to the repository.
+	•	Pattern-Based Scanning:
+The tool uses regular expressions to detect secrets. It comes pre-configured with common patterns for AWS access keys and other common secrets, but you can also add custom regex patterns to suit your project’s needs.
+	•	Preventing Sensitive Data Exposure:
+If a commit contains data matching any of the registered patterns, Git Secrets blocks the commit, ensuring that secrets aren’t accidentally exposed in your version control history.
+	•	CI/CD Integration:
+Git Secrets can be incorporated into your CI/CD pipeline, scanning pull requests and commits in automated builds to enforce security policies across your team.

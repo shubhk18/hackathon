@@ -10,6 +10,25 @@ Developers can use client-side Git hooks (via tools like pre-commit) to run stat
 	•	Secrets Detection: Scan for accidental commits of API keys, passwords, or other sensitive data.
 	•	Compliance Rules: Enforce coding standards and license checks.
 
+1. Pre-commit Framework
+	•	Overview:
+The pre-commit framework is one of the most popular tools for managing Git pre-commit hooks. It offers a repository of ready-made hooks for tasks like code formatting, linting, secret detection, and more.
+	•	Features:
+	•	Easy configuration via a YAML file (.pre-commit-config.yaml)
+	•	A large selection of hooks for multiple languages and tools (e.g., Black, Flake8, ESLint, ShellCheck, and more)
+	•	Automatic installation and updating of hooks
+Example Configuration:
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0  # Use the latest stable release
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+  - repo: https://github.com/psf/black
+    rev: 23.1.0  # Use the latest stable release of Black
+    hooks:
+      - id: black
 
 Git Secrets is an open-source tool originally developed by AWS Labs designed to help prevent developers from committing sensitive information—such as API keys, passwords, and other credentials—into Git repositories. Here’s a detailed look at its features, usage, and best practices:
 

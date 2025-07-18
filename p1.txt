@@ -1,1 +1,23 @@
-dmesg | grep -i "out of memory"
+1. Thread-Specific Error Tracking
+	•	Identify Crashing Threads: Instantly query which thread encountered an exception or crash and retrieve its preceding actions to identify root causes.
+	•	Trace Error Propagation: Query the sequence of events across multiple threads leading up to a failure, supporting identification of race conditions or deadlocks.
+2. Real-Time Status Inspection
+	•	Current Activity Check: Use “What is thread X doing now?” to determine if a thread is stuck, waiting, or actively processing a task.
+	•	Resource Bottleneck Detection: Watch for threads repeatedly logging waits on the same resource, indicating possible contention or resource leaks.
+3. Event Timeline Reconstruction
+	•	Action-by-Action Replay: Track the full sequence of events for a specific thread or set of threads, helping reconstruct what led to a bug or failure.
+	•	Cross-Thread Correlation: Correlate events between threads (e.g., when one thread signals another), crucial for debugging concurrency bugs.
+4. Pattern Recognition and Anomaly Detection
+	•	Detect Log Pattern Deviations: Ask for summaries of “normal” versus “abnormal” behavior, such as missed task completions, unexpected starts/stops, or repeated error messages.
+	•	Performance Regression Identification: Compare timelines or durations of typical workflows to spot new slowdowns introduced by recent changes.
+5. Automated Troubleshooting Prompts
+	•	Proactive Recommendations: The analyzer can suggest possible causes or next diagnostic steps based on error patterns, such as missing synchronization or configuration errors.
+	•	Suggest Log Snippets: Automatically retrieve the most relevant log entries based on user prompts, saving time when sifting through large volumes.
+6. Interactive Session-Based Debugging
+	•	Stepwise Investigation: Drill down from broad queries (“Which threads failed today?”) to specifics (“What was thread 17’s last message before exit?”).
+	•	State Comparison: Compare thread states at two different times to find unexpected transitions, restarts, or duplicated work.
+7. Custom Trigger/Event Alerting
+	•	Set Watch Points: Define triggers (e.g., “alert me if any thread logs ERROR in the next 10 minutes”) using chat commands for real-time debugging.
+	•	Retrospective Search: Search for past instances of a particular error code, stack trace, or event sequence for trend analysis.
+8. Contextual Log Summary
+	•	Quick Summaries: Summarize what a problematic thread did over its lifetime, or why a system entered an inconsistent state, reducing the need for manual log reading.

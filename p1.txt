@@ -1,3 +1,14 @@
+Notes:
+	•	The  ExceptionListener  in the JMS client captures disconnects.
+	•	 ListenerContainer  manages and restarts threads as needed for concurrency.
+	•	Automatic reconnect is available via properties on the client connection factory.
+	•	This pattern matches enterprise JMS listener implementations for IBM MQ
+
+
+
+
+
+
 +----------------------+
 |     IBM MQ Queue     |
 |     (on MQ Server)   |

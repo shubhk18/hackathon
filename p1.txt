@@ -1,34 +1,6 @@
-Notes:
-	•	The  ExceptionListener  in the JMS client captures disconnects.
-	•	 ListenerContainer  manages and restarts threads as needed for concurrency.
-	•	Automatic reconnect is available via properties on the client connection factory.
-	•	This pattern matches enterprise JMS listener implementations for IBM MQ
-
-
-
-
-
-
-+----------------------+
-|     IBM MQ Queue     |
-|     (on MQ Server)   |
-+----------+-----------+
-           |
- (TCP/IP - MQ Protocol)
-           |
-+----------v-----------+
-|   IBM MQ Client App  |
-| (via JMS API)        |
-+----------+-----------+
-           |
-+----------v------------------------------------+
-| JMS Listener Container (manages connection)  |
-|  - 1 Connection                              |
-|  - Multiple Sessions                         |
-+----------------------------------------------+
-|  Thread 1 |  Thread 2 |  Thread 3           |
-|   Session |   Session |   Session           |
-|     |          |          |                 |
-|  @JmsListener @JmsListener @JmsListener     |
-|    method     method      method            |
-+----------------------------------------------+
+File Size Example
+	•	How much text fits?
+	•	128,000 tokens ≈ 90,000–100,000 words (1 token ≈ 0.75 words in English).
+	•	For plain text, 1 character ≈ 1 byte. An average English word (with space/punctuation) ≈ 5.5 characters.
+	•	100,000 words × 5.5 = 550,000 bytes = ~550KB (plain text, UTF-8 encoding).
+	•	So: You can inject approximately 500–600KB of plain text into Llama 3.2 using either method, just like with Phi-3

@@ -1,6 +1,26 @@
-File Size Example
-	•	How much text fits?
-	•	128,000 tokens ≈ 90,000–100,000 words (1 token ≈ 0.75 words in English).
-	•	For plain text, 1 character ≈ 1 byte. An average English word (with space/punctuation) ≈ 5.5 characters.
-	•	100,000 words × 5.5 = 550,000 bytes = ~550KB (plain text, UTF-8 encoding).
-	•	So: You can inject approximately 500–600KB of plain text into Llama 3.2 using either method, just like with Phi-3
+Why Use Google Test (GTest) for a C++ Codebase?
+Google Test (GTest) is the most widely used unit testing framework for C++. It helps verify code
+correctness, prevents regressions, and integrates seamlessly with CI/CD pipelines.
+Key Benefits
+• Catch bugs early: Test individual functions and classes before integration.
+• Automate testing: Run hundreds or thousands of tests automatically.
+• Refactor safely: Ensure existing functionality still works after changes.
+• Improve code quality: Encourages modular and testable designs.
+• CI/CD integration: Execute tests automatically on every commit.
+• Rich assertions: EXPECT_EQ, EXPECT_TRUE, ASSERT_EQ, EXPECT_THROW, etc.
+• Parameterized tests: Reuse the same test logic with different inputs.
+• Test fixtures: Share common setup and cleanup code.
+• Mocking support: Use Google Mock (GMock) to isolate dependencies.
+• Detailed failure reports: Quickly identify failures with expected vs. actual values.
+Example
+int add(int a, int b) { return a + b; }
+TEST(AddTest, PositiveNumbers) {
+EXPECT_EQ(add(2,3), 5);
+}
+int main(int argc, char** argv) {
+testing::InitGoogleTest(&argc, argv);
+return RUN_ALL_TESTS();
+}
+Why Enterprises Use GTest
+Enterprise C++ applications in domains such as payments, trading, telecom, and storage rely on
+GTest to detect regressions early, support safe refactoring, improve maintainability, and enable

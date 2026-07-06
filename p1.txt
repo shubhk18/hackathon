@@ -1,26 +1,4 @@
-Why Use Google Test (GTest) for a C++ Codebase?
-Google Test (GTest) is the most widely used unit testing framework for C++. It helps verify code
-correctness, prevents regressions, and integrates seamlessly with CI/CD pipelines.
-Key Benefits
-• Catch bugs early: Test individual functions and classes before integration.
-• Automate testing: Run hundreds or thousands of tests automatically.
-• Refactor safely: Ensure existing functionality still works after changes.
-• Improve code quality: Encourages modular and testable designs.
-• CI/CD integration: Execute tests automatically on every commit.
-• Rich assertions: EXPECT_EQ, EXPECT_TRUE, ASSERT_EQ, EXPECT_THROW, etc.
-• Parameterized tests: Reuse the same test logic with different inputs.
-• Test fixtures: Share common setup and cleanup code.
-• Mocking support: Use Google Mock (GMock) to isolate dependencies.
-• Detailed failure reports: Quickly identify failures with expected vs. actual values.
-Example
-int add(int a, int b) { return a + b; }
-TEST(AddTest, PositiveNumbers) {
-EXPECT_EQ(add(2,3), 5);
-}
-int main(int argc, char** argv) {
-testing::InitGoogleTest(&argc, argv);
-return RUN_ALL_TESTS();
-}
-Why Enterprises Use GTest
-Enterprise C++ applications in domains such as payments, trading, telecom, and storage rely on
-GTest to detect regressions early, support safe refactoring, improve maintainability, and enable
+awk -F',' '
+NR==FNR && FNR>1 { seen[$2]=1; next }
+FNR==1 || !($2 in seen)
+' file2.csv file1.csv

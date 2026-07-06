@@ -7,3 +7,24 @@ awk -F',' '
 NR==FNR && FNR>1 { seen[$2]=1; next }
 FNR>1 && !($2 in seen) { print $2 }
 ' file2.csv file1.csv
+
+awk -F',' '
+BEGIN { OFS="," }
+
+NR==FNR && FNR>1 {
+    key = $2
+    for (i = 3; i <= NF; i++)
+        key = key OFS $i
+    seen[key] = 1
+    next
+}
+
+FNR>1 {
+    key = $2
+    for (i = 3; i <= NF; i++)
+        key = key OFS $i
+
+    if (!(key in seen))
+        print
+}
+' file2.csv file1.csv

@@ -2,3 +2,8 @@ awk -F',' '
 NR==FNR && FNR>1 { seen[$2]=1; next }
 FNR==1 || !($2 in seen)
 ' file2.csv file1.csv
+
+awk -F',' '
+NR==FNR && FNR>1 { seen[$2]=1; next }
+FNR>1 && !($2 in seen) { print $2 }
+' file2.csv file1.csv
